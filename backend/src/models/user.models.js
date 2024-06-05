@@ -63,7 +63,7 @@ userSchema.pre("save", async function (next){
 
 //compare password ie both decrypt and compare
 userSchema.methods.isPasswordCorrect = async function (password) {
-    return await bcrypt.compare(password, this.password);
+    return await bcrypt.compare(password, this.password)
 }
 
 //jwt token for user
