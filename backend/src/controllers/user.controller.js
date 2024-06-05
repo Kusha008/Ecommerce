@@ -16,8 +16,6 @@ const generateAccessAndRefreshTokens=async(userId)=>{
         const user=await User.findById(userId)
         const accessToken=user.generateAccessToken()
         const refreshToken=user.generateRefreshToken()
-        console.log("refresh token",refreshToken)
-        console.log("access token",accessToken)
 
         //now saving this refresh token into the db
         user.refreshToken=refreshToken
