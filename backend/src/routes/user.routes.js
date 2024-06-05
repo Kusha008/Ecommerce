@@ -14,5 +14,8 @@ router.route('/register').post(
 //login route
 router.route("/login").post(loginUser)
 
+//secured routes - user needs to be logged in to perform these actions
+router.route("/logout").get(verifyJWT, logoutUser)
+
 
 export default router;
