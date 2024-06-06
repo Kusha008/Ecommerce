@@ -42,10 +42,10 @@ const registerUser = asyncHandler(async (req, res) => {
     //remove password and refresh token field from response
     //check for user creation 
     //return res else return err response
-    const { fullName, email, username, password } = req.body;
+    const { fullName, email,phone, username, password } = req.body;
     
 
-    if ([fullName, email, username, password].some((field) => field?.trim() === "")) {
+    if ([fullName, email,phone, username, password].some((field) => field?.trim() === "")) {
         throw new ApiError(400, "All fields are required");
     }
 
@@ -54,6 +54,9 @@ const registerUser = asyncHandler(async (req, res) => {
     });
     if (existedUser) {
         throw new ApiError(409, "User with email or username already exists");
+    }
+    if(phone.length!==10){
+        throw new ApiError(400,"Enter valid phone number")
     }
 
     console.log('Uploaded file:', req.file); // Debug statement
@@ -71,6 +74,7 @@ const registerUser = asyncHandler(async (req, res) => {
     const user = await User.create({
         fullName,
         coverImage: coverImage?.url || "",
+        phone,
         email,
         password,
         username: username.toLowerCase()
@@ -262,6 +266,28 @@ const updateEmail=asyncHandler(async(req,res)=>{
     )
 
 })
+
+const updatePhone=asyncHandler(async(req,res)=>{
+    //get user id from req.user._id
+    //get new phone from req.body
+    //update phone in db
+    //return res with success message
+    const {newPhone}=req.body;
+    if(!newPhone){
+        throw new ApiError(400,"Phone is required")
+    }
+    if(newPhone.length!==10){
+        throw new ApiError(400,"Enter valid phone number")
+    }
+    const user=await User.findById(req.user._id);
+    user.phone=newPhone;
+    await user.save({validateBeforeSave:false});
+    return res.status(200)
+    .json(
+        new ApiResponse(200,user,"Phone updated successfully")
+    )
+
+})
 export { registerUser,
     loginUser,
     logoutUser,
@@ -269,4 +295,5 @@ export { registerUser,
     changeCurrentPassword,
     getCurrentUser,
     updateEmail,
+    updatePhone
  }
