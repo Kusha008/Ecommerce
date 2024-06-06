@@ -211,12 +211,62 @@ const changeCurrentPassword=asyncHandler(async(req,res)=>{
     user.password=newPassword;
     await user.save({validateBeforeSave:false});
 
+    const { accessToken, refreshToken }=generateAccessAndRefreshTokens(user._id);
+
+    // Clear old cookies and set new ones after changing the password
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+
+    return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(new ApiResponse(200, {}, "Password changed successfully"));
+})
+
+const getCurrentUser=asyncHandler(async(req,res)=>{
+    return res.status(200).json(new ApiResponse(200,req.user,"current user fetched successfully"))
+})
+
+const updateEmail=asyncHandler(async(req,res)=>{
+    //get user id from req.user._id
+    //get new email from req.body
+    //chekc if email is already exists in dn
+    //upadte email in db
+    //return res with success message
+    const {newEmail,password}=req.body;
+
+    if(!newEmail){
+        throw new ApiError(400,"Email is required")
+    }
+    const user=await User.findById(req.user._id);
+    
+    if(newEmail===user.email){
+        throw new ApiError(400,"Enter new Email")
+    }
+    
+    const emailExists=await User.findOne({newEmail});
+    if(emailExists){
+        throw new ApiError(409,"Email already exists")
+    }
+    user.email=newEmail;
+
+    const isPasswordCorrect=await user.isPasswordCorrect(password);
+    if(!isPasswordCorrect){
+        throw new ApiError(401,"Incorrect password")
+    }
+    await user.save({validateBeforeSave:false});
     return res.status(200)
-    .json(new ApiResponse(200,{},"Password changed successfully"))
+    .json(
+        new ApiResponse(200,user,"Email updated successfully")
+    )
+
 })
 export { registerUser,
     loginUser,
     logoutUser,
     refreshAccessToken,
-    changeCurrentPassword
+    changeCurrentPassword,
+    getCurrentUser,
+    updateEmail,
  }
