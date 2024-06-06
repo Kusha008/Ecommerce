@@ -20,6 +20,7 @@ const reviewSchema = new mongoose.Schema(
             type: Number,
             required: true,
             maxVal: 5,
+            enum: [1, 2, 3, 4, 5]
         },
         reviewDate: {
             type: Date,
@@ -28,6 +29,9 @@ const reviewSchema = new mongoose.Schema(
         isVerfied: {
             type: Boolean,
             default: false
+        },
+        image: {
+            type: String
         }
     },
     {

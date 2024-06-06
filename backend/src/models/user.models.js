@@ -44,7 +44,7 @@ const userSchema = new mongoose.Schema(
         }],
         order: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Orders"
+            ref: "Order"
         },
         refreshToken: {
             type: String
@@ -55,9 +55,9 @@ const userSchema = new mongoose.Schema(
         },
         otp:{
             type:String
-        }
-    }
-    ,
+        },
+        isAdmin: { type: Boolean, default: false },
+    },
     {
         timestamps: true
     }

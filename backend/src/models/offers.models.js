@@ -20,6 +20,8 @@ const offerSchema=new mongoose.Schema({
     },
     isActive:{
         type:Boolean,
-        default:true
+        default:false
     }
 })
+
+export const Offer=mongoose.model("Offer",offerSchema)
