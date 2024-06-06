@@ -18,11 +18,16 @@ const reviewSchema = new mongoose.Schema(
         },
         rating: {
             type: Number,
-            required: true
+            required: true,
+            maxVal: 5,
         },
         reviewDate: {
             type: Date,
             default: Date.now
+        },
+        isVerfied: {
+            type: Boolean,
+            default: false
         }
     },
     {

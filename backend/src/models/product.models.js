@@ -29,7 +29,11 @@ const productSchema=new mongoose.Schema(
         categoryId:{
             type:mongoose.Schema.Types.ObjectId,
             ref:"Category"
-        }
+        },
+        sellerInfo:{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:"Seller"
+        },
     }
     ,
     {

@@ -59,7 +59,7 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(400,"Enter valid phone number")
     }
 
-    console.log('Uploaded file:', req.file); // Debug statement
+    // console.log('Uploaded file:', req.file); // Debug statement
 
     let coverImage = "";
     if (req.file) {
@@ -220,6 +220,7 @@ const changeCurrentPassword=asyncHandler(async(req,res)=>{
     // Clear old cookies and set new ones after changing the password
     res.clearCookie("accessToken");
     res.clearCookie("refreshToken");
+    // user.refreshToken = refreshToken;
 
     return res
     .status(200)
