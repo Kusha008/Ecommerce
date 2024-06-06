@@ -289,6 +289,32 @@ const updatePhone=asyncHandler(async(req,res)=>{
     )
 
 })
+
+const updateCoverImage=asyncHandler(async(req,res)=>{
+    //get user id from req.user._id
+    //check for image
+    //upload image to cloudinary
+    //update cover image in db
+    //return res with success message
+    const user=await User.findById(req.user._id);
+
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+    let coverImage="";
+    console.log(req.file);
+    if(req.file){
+        try {
+            coverImage=await uploadOnCloudinary(req.file.path)
+        } catch (error) {
+            console.error('Error uploading image to Cloudinary:', error);
+            throw new ApiError(500, "Error uploading image to Cloudinary");
+        }
+    }
+})
+
+
+
 export { registerUser,
     loginUser,
     logoutUser,
@@ -296,5 +322,6 @@ export { registerUser,
     changeCurrentPassword,
     getCurrentUser,
     updateEmail,
-    updatePhone
+    updatePhone,
+    updateCoverImage
  }
