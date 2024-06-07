@@ -94,6 +94,68 @@ const registerUser = asyncHandler(async (req, res) => {
         new ApiResponse(200, createdUser, "USER REGISTERED SUCCESSFULLY")
     );
 });
+const sendVerificationEmail = asyncHandler(async (req, res) => {
+    const userID=req.user._id;
+    const user=await User.findById(userID);
+    console.log(user);
+    const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, lowerCaseAlphabets: false });
+
+    // Encode OTP using JWT
+    const encodedOtp = jwt.sign({ otp }, process.env.JWT_SECRET, { expiresIn: '5m' });
+
+    // Send OTP via email
+    const mailOptions = {
+        from: process.env.EMAIL_USERNAME,
+        to: user.email,
+        subject: 'Your OTP Code ',
+        text: `Your OTP code to Verify your account is ${otp}`,
+    };
+    console.log(mailOptions);
+    const emailSent = await sendEmail(mailOptions);
+    if (!emailSent) {
+        throw new ApiError(500, 'Failed to send verification email');
+    }
+
+    res.cookie('otp', encodedOtp, { httpOnly: true, expires: new Date(Date.now() + 5 * 60 * 1000) });
+    res.status(200).json(new ApiResponse(200, {}, 'OTP sent to you registered email address'));
+
+});
+
+const verifyUser = asyncHandler(async (req, res) => {
+    const {otp} = req.body;
+    const userId = req.user._id;
+
+    // Decode the OTP from the cookie
+    const encodedOtp = req.cookies.otp;
+    if (!encodedOtp) {
+        throw new ApiError(400, 'OTP not found');
+    }
+
+    let decodedOtp;
+    try {
+        decodedOtp = jwt.verify(encodedOtp, process.env.JWT_SECRET);
+    } catch (err) {
+        throw new ApiError(400, 'Invalid OTP');
+    }
+
+    
+    if (decodedOtp.otp !== otp) {
+        throw new ApiError(400, 'Invalid OTP');
+    }
+
+    
+    const user = await User.findById(userId);
+    if (!user) {
+        throw new ApiError(404, 'User not found');
+    }
+    user.isVerified = true;
+    await user.save();
+
+    res.clearCookie('otp');
+
+    res.status(200).json(new ApiResponse(200, {}, 'User verified successfully'));
+
+});
 
 const loginUser=asyncHandler(async(req,res)=>{
     //get user details from fronten
@@ -386,6 +448,8 @@ const verifyAndUpdateEmail = asyncHandler(async (req, res) => {
 
 export { registerUser,
     loginUser,
+    sendVerificationEmail,
+    verifyUser,
     logoutUser,
     refreshAccessToken,
     changeCurrentPassword,

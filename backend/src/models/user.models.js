@@ -53,6 +53,7 @@ const userSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "Cart"
         },
+        isVerified: { type: Boolean, default: false },
         isAdmin: { type: Boolean, default: false },
     },
     {
