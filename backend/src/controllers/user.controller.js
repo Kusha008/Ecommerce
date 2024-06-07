@@ -4,7 +4,12 @@ import {User} from "../models/user.models.js"
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken"
+import 'dotenv/config';
 import mongoose from "mongoose";
+import nodeMailer from "nodemailer";
+import otpGenerator from 'otp-generator';
+import { sendEmail } from '../utils/sendEmail.js';
+
 
 // const registerUser=asyncHandler(async(req,res)=>{
 //     res.status(200).json({
@@ -233,40 +238,40 @@ const getCurrentUser=asyncHandler(async(req,res)=>{
     return res.status(200).json(new ApiResponse(200,req.user,"current user fetched successfully"))
 })
 
-const updateEmail=asyncHandler(async(req,res)=>{
-    //get user id from req.user._id
-    //get new email from req.body
-    //chekc if email is already exists in dn
-    //upadte email in db
-    //return res with success message
-    const {newEmail,password}=req.body;
+// const updateEmail=asyncHandler(async(req,res)=>{
+//     //get user id from req.user._id
+//     //get new email from req.body
+//     //chekc if email is already exists in dn
+//     //upadte email in db
+//     //return res with success message
+//     const {newEmail,password}=req.body;
 
-    if(!newEmail){
-        throw new ApiError(400,"Email is required")
-    }
-    const user=await User.findById(req.user._id);
+//     if(!newEmail){
+//         throw new ApiError(400,"Email is required")
+//     }
+//     const user=await User.findById(req.user._id);
     
-    if(newEmail===user.email){
-        throw new ApiError(400,"Enter new Email")
-    }
+//     if(newEmail===user.email){
+//         throw new ApiError(400,"Enter new Email")
+//     }
     
-    const emailExists=await User.findOne({newEmail});
-    if(emailExists){
-        throw new ApiError(409,"Email already exists")
-    }
-    user.email=newEmail;
+//     const emailExists=await User.findOne({newEmail});
+//     if(emailExists){
+//         throw new ApiError(409,"Email already exists")
+//     }
+//     user.email=newEmail;
 
-    const isPasswordCorrect=await user.isPasswordCorrect(password);
-    if(!isPasswordCorrect){
-        throw new ApiError(401,"Incorrect password")
-    }
-    await user.save({validateBeforeSave:false});
-    return res.status(200)
-    .json(
-        new ApiResponse(200,user,"Email updated successfully")
-    )
+//     const isPasswordCorrect=await user.isPasswordCorrect(password);
+//     if(!isPasswordCorrect){
+//         throw new ApiError(401,"Incorrect password")
+//     }
+//     await user.save({validateBeforeSave:false});
+//     return res.status(200)
+//     .json(
+//         new ApiResponse(200,user,"Email updated successfully")
+//     )
 
-})
+// })
 
 const updatePhone=asyncHandler(async(req,res)=>{
     //get user id from req.user._id
@@ -313,6 +318,70 @@ const updateCoverImage=asyncHandler(async(req,res)=>{
     }
 })
 
+const requestEmailUpdate = asyncHandler(async (req, res) => {
+    const { newEmail } = req.body;
+    const userId = req.user._id;
+
+    const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, lowerCaseAlphabets: false });
+
+    // Encode OTP using JWT
+    const encodedOtp = jwt.sign({ otp }, process.env.JWT_SECRET, { expiresIn: '5m' });
+
+    // Send OTP via email
+    const mailOptions = {
+        from: process.env.EMAIL_USERNAME,
+        to: newEmail,
+        subject: 'Your OTP Code',
+        text: `Your OTP code is ${otp}`,
+    };
+
+    const emailSent = await sendEmail(mailOptions);
+    if (!emailSent) {
+        throw new ApiError(500, 'Failed to send OTP email');
+    }
+
+    res.cookie('otp', encodedOtp, { httpOnly: true, expires: new Date(Date.now() + 5 * 60 * 1000) });
+    res.status(200).json(new ApiResponse(200, {}, 'OTP sent to new email address'));
+});
+
+const verifyAndUpdateEmail = asyncHandler(async (req, res) => {
+    const { newEmail,otp } = req.body;
+    const userId = req.user._id;
+
+    // Decode the OTP from the cookie
+    const encodedOtp = req.cookies.otp;
+    if (!encodedOtp) {
+        throw new ApiError(400, 'OTP not found');
+    }
+
+    // Verify the OTP using JWT
+    let decodedOtp;
+    try {
+        decodedOtp = jwt.verify(encodedOtp, process.env.JWT_SECRET);
+    } catch (err) {
+        throw new ApiError(400, 'Invalid OTP');
+    }
+
+    
+    if (decodedOtp.otp !== otp) {
+        throw new ApiError(400, 'Invalid OTP');
+    }
+
+    
+    const user = await User.findById(userId);
+    if (!user) {
+        throw new ApiError(404, 'User not found');
+    }
+
+    
+    user.email = newEmail;
+    await user.save();
+
+    res.clearCookie('otp');
+
+    res.status(200).json(new ApiResponse(200, {}, 'Email updated successfully'));
+});
+
 
 
 export { registerUser,
@@ -321,7 +390,8 @@ export { registerUser,
     refreshAccessToken,
     changeCurrentPassword,
     getCurrentUser,
-    updateEmail,
     updatePhone,
-    updateCoverImage
+    updateCoverImage,
+    requestEmailUpdate,
+    verifyAndUpdateEmail
  }
