@@ -373,6 +373,7 @@ const updateCoverImage=asyncHandler(async(req,res)=>{
     if(req.file){
         try {
             coverImage=await uploadOnCloudinary(req.file.path)
+            return res.status(200).json(new ApiResponse(200, user, "Cover image updated successfully"));
         } catch (error) {
             console.error('Error uploading image to Cloudinary:', error);
             throw new ApiError(500, "Error uploading image to Cloudinary");
