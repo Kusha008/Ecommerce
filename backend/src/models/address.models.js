@@ -7,15 +7,22 @@ const addressSchema = new mongoose.Schema(
             ref: "User",
             required: true
         },
-        address: {
+        addressLine1: {
             type: String,
             required: true
+        },
+        addressLine2: {
+            type: String,
         },
         city: {
             type: String,
             required: true
         },
-        zipCode: {
+        state:{
+            type: String,
+            required: true
+        },
+        zipcode: {
             type: Number,
             required: true
         },
@@ -37,4 +44,4 @@ const addressSchema = new mongoose.Schema(
     }
 )
 
-const addressModel=mongoose.model("Address",addressSchema)
+export const addressModel=mongoose.model("Address",addressSchema)
