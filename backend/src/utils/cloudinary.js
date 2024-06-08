@@ -29,4 +29,31 @@ const uploadOnCloudinary= async(localFilePath)=>{
     }
 }
 
-export {uploadOnCloudinary}
+const deleteFromCloudinary = async (imageUrl) => {
+    try {
+        if (!imageUrl) {
+            return null;
+        }
+        // Extract the public ID from the image URL
+        const urlParts = imageUrl.split('/');
+        const publicIdWithExtension = urlParts[urlParts.length - 1];
+        const publicId = publicIdWithExtension.split('.')[0];
+        console.log("publicId",publicId);
+
+        // Delete the image from Cloudinary
+        const response = await cloudinary.uploader.destroy(publicId);
+        console.log("response",response);
+
+        if (response.result !== 'ok') {
+            throw new Error('Cloudinary deletion failed');
+        }
+
+        return response;
+    } catch (error) {
+        console.error('Error deleting from Cloudinary:', error); // Debug statement
+        throw new Error('Cloudinary deletion failed');
+    }
+};
+export {uploadOnCloudinary,
+    deleteFromCloudinary
+}

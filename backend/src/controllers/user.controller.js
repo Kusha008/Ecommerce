@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import {ApiError} from '../utils/ApiError.js'
 import {User} from "../models/user.models.js"
-import {uploadOnCloudinary} from "../utils/cloudinary.js"
+import {deleteFromCloudinary, uploadOnCloudinary} from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken"
 import 'dotenv/config';
@@ -47,7 +47,7 @@ const registerUser = asyncHandler(async (req, res) => {
     //remove password and refresh token field from response
     //check for user creation 
     //return res else return err response
-    const { fullName, email,phone, username, password } = req.body;
+    const { fullName, email,phone, username, password} = req.body;
     
 
     if ([fullName, email,phone, username, password].some((field) => field?.trim() === "")) {
@@ -368,11 +368,22 @@ const updateCoverImage=asyncHandler(async(req,res)=>{
     if (!user) {
         throw new ApiError(404, "User not found");
     }
+    const currImage=await user.coverImage;
+    
     let coverImage="";
     console.log(req.file);
     if(req.file){
         try {
             coverImage=await uploadOnCloudinary(req.file.path)
+            if(currImage){
+                try {
+                    await deleteFromCloudinary(currImage);
+                }
+                catch (error) {
+                    console.error('Error deleting image from Cloudinary:', error);
+                    throw new ApiError(500, "Error deleting image from Cloudinary");
+                }
+            }
             return res.status(200).json(new ApiResponse(200, user, "Cover image updated successfully"));
         } catch (error) {
             console.error('Error uploading image to Cloudinary:', error);
