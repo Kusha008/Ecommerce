@@ -16,10 +16,16 @@ app.use(cookieParser())
 
 import userRouter from './routes/user.routes.js'
 import addressRouter from './routes/address.routes.js'
+import productRouter from './routes/product.routes.js'
+import sellerRouter from './routes/seller.routes.js'
+import categoryRouter from './routes/category.routes.js'
 
 //routes declaration
 app.use('/api/v1/users',userRouter)
 app.use('/api/v1/users/addresses',addressRouter)
+app.use('/api/v1/products',productRouter)
+app.use('/api/v1/sellers',sellerRouter)
+app.use('/api/v1/categories',categoryRouter)
 
 
 //http://localhost:8000/api/v1/user/register
