@@ -368,16 +368,19 @@ const updateCoverImage=asyncHandler(async(req,res)=>{
     if (!user) {
         throw new ApiError(404, "User not found");
     }
+
     const currImage=await user.coverImage;
-    
+    // console.log("currIMAGE",currImage);
     let coverImage="";
-    console.log(req.file);
+    // console.log(req.file);
     if(req.file){
         try {
             coverImage=await uploadOnCloudinary(req.file.path)
             if(currImage){
                 try {
                     await deleteFromCloudinary(currImage);
+                    user.coverImage=coverImage.url;
+                    await user.save({validateBeforeSave:false});
                 }
                 catch (error) {
                     console.error('Error deleting image from Cloudinary:', error);
