@@ -20,7 +20,11 @@ const cartSchema = new mongoose.Schema(
                     //check if the quantity is always less than the stock available
                 }
             }
-        ]
+        ],
+        discountValue: {
+            type: Number,
+            default: 0
+        }
     },
     {
         timestamps: true

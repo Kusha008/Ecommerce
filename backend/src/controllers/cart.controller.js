@@ -144,6 +144,7 @@ const getCartValue=asyncHandler(async(req,res)=>{
     cart.products.forEach(p=>{
         total+=p.productId.price*p.quantity;
     })
+    total-=cart.discountValue;
     return res.status(200).json(
         new ApiResponse(200,total,'Cart value retrieved')
     )
