@@ -20,6 +20,7 @@ import productRouter from './routes/product.routes.js'
 import sellerRouter from './routes/seller.routes.js'
 import categoryRouter from './routes/category.routes.js'
 import cartRouter from './routes/cart.routes.js'
+import reviewRouter from './routes/review.routes.js'
 
 //routes declaration
 app.use('/api/v1/users',userRouter)
@@ -28,6 +29,7 @@ app.use('/api/v1/products',productRouter)
 app.use('/api/v1/sellers',sellerRouter)
 app.use('/api/v1/categories',categoryRouter)
 app.use('/api/v1/cart',cartRouter)
+app.use('/api/v1/reviews',reviewRouter)
 
 
 //http://localhost:8000/api/v1/user/register
