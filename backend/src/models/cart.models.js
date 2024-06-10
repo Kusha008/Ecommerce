@@ -17,6 +17,7 @@ const cartSchema = new mongoose.Schema(
                 quantity: {
                     type: Number,
                     required: true
+                    //check if the quantity is always less than the stock available
                 }
             }
         ]
@@ -26,4 +27,4 @@ const cartSchema = new mongoose.Schema(
     }
 )
 
-const Cart = mongoose.model("Cart", cartSchema)
+export const Cart = mongoose.model("Cart", cartSchema)

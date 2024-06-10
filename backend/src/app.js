@@ -19,6 +19,7 @@ import addressRouter from './routes/address.routes.js'
 import productRouter from './routes/product.routes.js'
 import sellerRouter from './routes/seller.routes.js'
 import categoryRouter from './routes/category.routes.js'
+import cartRouter from './routes/cart.routes.js'
 
 //routes declaration
 app.use('/api/v1/users',userRouter)
@@ -26,6 +27,7 @@ app.use('/api/v1/users/addresses',addressRouter)
 app.use('/api/v1/products',productRouter)
 app.use('/api/v1/sellers',sellerRouter)
 app.use('/api/v1/categories',categoryRouter)
+app.use('/api/v1/cart',cartRouter)
 
 
 //http://localhost:8000/api/v1/user/register
