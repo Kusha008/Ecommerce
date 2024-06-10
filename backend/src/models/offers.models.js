@@ -10,13 +10,21 @@ const offerSchema=new mongoose.Schema({
         required:true,
         unique:true
     },
+    validFrom:{
+        type:Date,
+        required:true
+    },
     expiryDate:{
         type:Date,
         required:true
     },
-    cart:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"Cart"
+    // cart:{
+    //     type:mongoose.Schema.Types.ObjectId,
+    //     ref:"Cart"
+    // },
+    minCartValue:{
+        type:Number,
+        required:true
     },
     isActive:{
         type:Boolean,
