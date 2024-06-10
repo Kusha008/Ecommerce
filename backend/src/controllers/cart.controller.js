@@ -134,6 +134,20 @@ const clearCart=asyncHandler(async(req,res)=>{
         new ApiResponse(200,cart,'Cart is empty now')
     )
 })
+const getCartValue=asyncHandler(async(req,res)=>{
+    const user=req.user._id;
+    const cart=await Cart.findOne({userId:user}).populate('products.productId');
+    if(!cart){
+        throw new ApiError(404,'Cart not found');
+    }
+    let total=0;
+    cart.products.forEach(p=>{
+        total+=p.productId.price*p.quantity;
+    })
+    return res.status(200).json(
+        new ApiResponse(200,total,'Cart value retrieved')
+    )
+})
 
 
 export {
@@ -143,5 +157,6 @@ export {
     updateCartItem,
     // increaseItemQuantity,
     // decrementItemQuantity,
-    clearCart
+    clearCart,
+    getCartValue
 }
