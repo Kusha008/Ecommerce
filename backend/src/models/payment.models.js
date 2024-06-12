@@ -10,18 +10,13 @@ const paymentSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    paymentDate:{
-        type:Date,
+    transactionId:{
+        type:String,
         required:true
     },
     amount:{
         type:Number,
         required:true
-    },
-    paymentStatus:{
-        type:String,
-        required:true,
-        enum:["pending","completed","cancelled"]
     },
     userId:{
         type:mongoose.Schema.Types.ObjectId,
@@ -29,6 +24,10 @@ const paymentSchema = new mongoose.Schema({
         required:true
     }
     
-})
+},
+{
+    timestamps:true
+}
+)
 
-const Payment=mongoose.model("Payment",paymentSchema)
+export const Payment=mongoose.model("Payment",paymentSchema)
