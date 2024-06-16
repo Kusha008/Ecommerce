@@ -14,7 +14,7 @@ function Verify() {
         await axios.post('api/v1/users/verify-user-otp', { otp: otpValue });
         toast.success('OTP verified successfully!');
         navigate('/');
-        window.location.reload(true);
+        // window.location.reload(true);
     } catch (error) {
         toast.error(error.response?.data?.message || 'An error occurred')
     }

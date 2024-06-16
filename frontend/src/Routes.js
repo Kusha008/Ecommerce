@@ -1,11 +1,17 @@
-import LoginPage from "../src/pages/Login.jsx"
-import RegisterPage from "../src/pages/Register.jsx"
-import VerifyPage from "../src/pages/Verify.jsx"
-import HomePage from "../src/pages/Home.jsx"
+import LoginPage from "./pages/LoginPage.jsx"
+import RegisterPage from "./pages/RegisterPage.jsx"
+import VerifyPage from "./pages/VerifyPage.jsx"
+import HomePage from "./pages/HomePage.jsx"
+import ProfilePage from "./pages/ProfilePage.jsx"
+import CartPage from "./pages/CartPage.jsx"
+// import CategoryPage from "./pages/CategoryPage.jsx"
 
 export {
     LoginPage,
     RegisterPage,
     VerifyPage,
-    HomePage
+    HomePage,
+    ProfilePage,
+    CartPage
+    // CategoryPage
 }

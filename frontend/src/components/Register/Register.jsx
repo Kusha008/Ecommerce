@@ -46,6 +46,7 @@ const Register = () => {
       setcoverImage();
       navigate("/login");
     } catch (error) {
+      console.log(error.response);
       toast.error(error.response?.data?.message || "An error occurred");
       console.log(error);
     }
@@ -184,7 +185,7 @@ const Register = () => {
                       {coverImage ? (
                         <img
                           src={coverImage}
-                          alt="avatar"
+                          alt="coverImage"
                           className="h-full w-full object-cover rounded-full"
                         />
                       ) : (
