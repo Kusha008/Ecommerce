@@ -10,6 +10,7 @@ import {
     getProductbyId, 
     getProductbySeller, 
     getProducts, 
+    searchProducts, 
     updateProduct 
 } from "../controllers/product.controller.js";
 
@@ -40,6 +41,6 @@ router.route("/createProduct").post(
 //updating and deleting the product
 router.route("/update/:productId").put(verifyJWTforSeller,updateProduct)//working
 router.route("/delete/:productId").delete(verifyJWTforSeller,deleteProduct)//working
-
+router.route('/search').get(searchProducts);
 
 export default router;

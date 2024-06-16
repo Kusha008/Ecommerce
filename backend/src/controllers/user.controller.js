@@ -153,7 +153,9 @@ const verifyUser = asyncHandler(async (req, res) => {
 
     res.clearCookie('otp');
 
-    res.status(200).json(new ApiResponse(200, {}, 'User verified successfully'));
+    res.status(200).
+    cookie("isVerified",true,options).
+    json(new ApiResponse(200, {}, 'User verified successfully'));
 
 });
 
@@ -219,6 +221,7 @@ const logoutUser=asyncHandler(async(req,res)=>{
     //clear cookies
     res.clearCookie("accessToken");
     res.clearCookie("refreshToken");
+    res.clearCookie("isVerified");
 
     return res.status(200).json(new ApiResponse(200, user, "User logged out successfully"));
 })
@@ -460,7 +463,69 @@ const verifyAndUpdateEmail = asyncHandler(async (req, res) => {
     res.status(200).json(new ApiResponse(200, {}, 'Email updated successfully'));
 });
 
+const updateFullName = asyncHandler(async (req, res) => {
+    const { fullName } = req.body;
+    
+    if (!fullName) {
+        throw new ApiError(400, "Full name is required");
+    }
 
+    const user = await User.findById(req.user._id);
+    
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+    
+    user.fullName = fullName;
+    
+    await user.save({ validateBeforeSave: false });
+    
+    return res.status(200).json(
+        new ApiResponse(200, user, "Full name updated successfully")
+    );
+});
+const generateEmailOTP=asyncHandler(async(req,res)=>{
+    const {email}=req.body;
+    const user=await User.findOne({email});
+    if(!user){
+        throw new ApiError(404,"User not found")
+    }
+    const otp=otpGenerator.generate(6,{upperCaseAlphabets:false,specialChars:false,lowerCaseAlphabets:false});
+    const encodedOtp=jwt.sign({otp},process.env.JWT_SECRET,{expiresIn:'5m'});
+    const mailOptions={
+        from:process.env.EMAIL_USERNAME,
+        to:email,
+        subject:"Your OTP Code",
+        text:`Your OTP code is ${otp}`
+    };
+    const emailSent=await sendEmail(mailOptions);
+    if(!emailSent){
+        throw new ApiError(500,"Failed to send OTP email")
+    }
+    res.cookie('otp',encodedOtp,{httpOnly:true,expires:new Date(Date.now()+5*60*1000)});
+    res.status(200).json(new ApiResponse(200,{},'OTP sent to your registered email address'));
+})
+
+const verifyOTP=asyncHandler(async(req,res)=>{
+    const {otp}=req.body;
+    // const userId=req.user._id;
+    const encodedOtp=req.cookies.otp;
+    if(!encodedOtp){
+        throw new ApiError(400,"OTP not found")
+    }
+    let decodedOtp;
+    try {
+        decodedOtp=jwt.verify(encodedOtp,process.env.JWT_SECRET)
+    } catch (error) {
+        throw new ApiError(400,"Invalid OTP")
+    }
+    if(decodedOtp.otp!==otp){
+        throw new ApiError(400,"Invalid OTP")
+    }
+
+    res.clearCookie('otp');
+    res.status(200).json(new ApiResponse(200,{},'User verified successfully'));
+})
 
 export { registerUser,
     loginUser,
@@ -473,5 +538,9 @@ export { registerUser,
     updatePhone,
     updateCoverImage,
     requestEmailUpdate,
-    verifyAndUpdateEmail
+    verifyAndUpdateEmail,
+    updateFullName,
+    generateEmailOTP,
+    verifyOTP
+
  }

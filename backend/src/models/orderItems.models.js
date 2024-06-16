@@ -20,11 +20,21 @@ const orderItemsSchema = new mongoose.Schema(
             type: Number,
             required: true
         },
-        seller:{
+        sellerID: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Seller",
+            required: true
+        },
+        userId:{
             type:mongoose.Schema.Types.ObjectId,
-            ref:"Seller",
+            ref:"User",
             required:true
-        }
+        },
+        orderStatus:{
+            type:String,
+            default:"pending",
+            enum:["pending","shipped","dispatched","delivered","cancelled"],
+        },
     },
     {
         timestamps: true

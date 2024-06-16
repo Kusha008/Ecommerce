@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 const cartSchema = new mongoose.Schema(
     {
         userId: {
@@ -30,5 +30,5 @@ const cartSchema = new mongoose.Schema(
         timestamps: true
     }
 )
-
+cartSchema.plugin(mongooseAggregatePaginate)
 export const Cart = mongoose.model("Cart", cartSchema)
