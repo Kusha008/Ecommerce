@@ -21,9 +21,15 @@ const sellerSlice = createSlice({
     setCurrentSeller: (state, action) => {
       state.seller = action.payload;
     },
+    patchSeller(state, action) {
+      state.seller = {
+        ...state.seller,
+        ...action.payload,
+      };
+    },
   },
 });
 
-export const { loginSeller, logoutSeller,setCurrentSeller } = sellerSlice.actions;
+export const { loginSeller, logoutSeller,setCurrentSeller,patchSeller} = sellerSlice.actions;
 
 export default sellerSlice.reducer;

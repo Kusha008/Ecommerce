@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
 const orderItemsSchema = new mongoose.Schema(
     {
         orderID: {
@@ -41,4 +41,5 @@ const orderItemsSchema = new mongoose.Schema(
     }
 )
 
+orderItemsSchema.plugin(aggregatePaginate);
 export const OrderItems=mongoose.model("OrderItems",orderItemsSchema)

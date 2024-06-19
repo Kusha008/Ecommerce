@@ -62,10 +62,10 @@ const verifyPayment=asyncHandler(async(req,res,next)=>{
 
     const newPayment=new Payment({
         orderId:payment.notes.orderId,
-        user:req.user._id,
+        userID:req.user._id,
         paymentMethod:payment.method,
         amount:payment.amount/100,
-        transactionId:razorpay_payment_id,
+        transactionId:payment.id,
     });
 
     if(!newPayment){

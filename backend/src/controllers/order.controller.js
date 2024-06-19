@@ -5,23 +5,22 @@ import {Order} from '../models/orders.models.js'
 import { OrderItems } from '../models/orderItems.models.js'
 
 const createOrder = asyncHandler(async (req, res) => {
-    const {orderId,total}=req.body;
+    const {orderId,total,transactionId}=req.body;
 
     if(!orderId || !total){
-        res.status(400);
-        throw new ApiError("All fields are required");
+        
+        throw new ApiError(400,"All fields are required");
     }
 
     const userId=req.user._id;
     const createdOrder = await Order.create({
         _id:orderId,
         total,
-        //transactionId,
+        transactionId,
         userId:userId
     })
     if(!createdOrder){
-        res.status(400);
-        throw new ApiError("Order creation failed")
+        throw new ApiError(400,"Order creation failed")
     }
 
     return res.status(201).json(new ApiResponse(201,createdOrder,"Order created successfully"));

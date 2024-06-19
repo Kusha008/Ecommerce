@@ -33,7 +33,7 @@ router.route("/logout").get(verifyJWTforSeller,logoutSeller);//working
 router.route("/refresh-token").post(refreshAccessToken);//working
 router.route("/current-seller").get(verifyJWTforSeller,getCurrentSeller);//working
 router.route("/change-password").post(verifyJWTforSeller,changeCurrentPassword);//working
-router.route("/update-phone").post(verifyJWTforSeller,updatePhone);//working
+router.route("/update-phone").patch(verifyJWTforSeller,updatePhone);//working
 router.route("/update-address").post(verifyJWTforSeller,updateAddress);//working
 router.route("/update-coverImage").post(verifyJWTforSeller,upload.single("sellerImage"),updateCoverImageSeller);//working
 router.route("/delete-seller").delete(verifyJWTforSeller,deleteSeller);//working

@@ -1,12 +1,12 @@
 import {Router} from "express"
-import { verifyJWT, verifyJWTforSeller, verifySeller } from "../middlewares/auth.middlewares.js";
-import { verifyisAdmin } from "../middlewares/admin.middlewares.js";
-import { upload } from '../middlewares/multer.middlewares.js';
+import { verifyJWT, verifyJWTforSeller, verifySeller } from "../middlewares/auth.middleware.js";
+import { verifyisAdmin } from "../middlewares/admin.middleware.js";
+import { upload } from '../middlewares/multer.middleware.js';
 import {
     createOrder,
     getOrderByUser,
     getOrdersByAllForAdmin
-} from "../controllers/order.controllers.js";
+} from "../controllers/order.controller.js";
 
 
 const router = Router()
