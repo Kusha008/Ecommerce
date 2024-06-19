@@ -169,6 +169,7 @@ const loginSeller = asyncHandler(async (req, res) => {
     .status(200)
     .cookie("accessToken",accessToken,options)
     .cookie("refreshToken",refreshToken,options)
+    .cookie("sellerVerified",loggedInSeller.sellerVerified,options)
     .json(
         new ApiResponse(
             200,
@@ -247,7 +248,10 @@ const refreshAccessToken=asyncHandler(async(req,res)=>{
 })
 
 const getCurrentSeller = asyncHandler(async (req, res) => {
-    return res.status(200).json(new ApiResponse(200,req.seller,"current seller fetched successfully"))
+    const seller = await Seller.findById(req.user._id).select("-sellerPassword -sellerRefreshToken");
+    // console.log("SLLL",seller)
+    return res.status(200).json(new ApiResponse(200,seller,"current seller fetched successfully"))
+    
 })
 
 const changeCurrentPassword=asyncHandler(async(req,res)=>{

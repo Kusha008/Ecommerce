@@ -2,8 +2,16 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Product } from '../models/product.models.js';
-import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import {Review} from "../models/review.models.js"
+
+
+const updateProductRating = async (productId) => {
+    const reviews = await Review.find({ productId: productId });
+    const averageRating = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
+    
+    await Product.findByIdAndUpdate(productId, { rating: averageRating });
+};
 
 const postReview = asyncHandler(async (req, res) => {
     const {productId} = req.params;
@@ -27,6 +35,8 @@ const postReview = asyncHandler(async (req, res) => {
             console.error('Error uploading image to Cloudinary:', error);
             throw new ApiError(500, "Error uploading image to Cloudinary");
         }
+    }else{
+        throw new ApiError(400, "Review image is required")
     }
 
     const review = await Review.create({
@@ -36,6 +46,8 @@ const postReview = asyncHandler(async (req, res) => {
         rating,
         reviewImage:reviewImage?.url || ""
     })
+
+    await updateProductRating(productId);
 
     if(!review) throw new ApiError(500, "Error creating review")
     return res.status(201).json(new ApiResponse(201, review, "Review posted successfully"))
@@ -59,8 +71,6 @@ const updateReview = asyncHandler(async (req, res) => {
 
     if(comment) review.comment=comment
     if(rating) review.rating=rating
-
-    const currImage=review.reviewImage;
     
     let reviewImage="";
     console.log(req.file);
@@ -70,13 +80,14 @@ const updateReview = asyncHandler(async (req, res) => {
             if(!reviewImage) throw new ApiError(500,"Error uploading image to cloudinary")
             review.reviewImage=reviewImage.url;
             await review.save({validateBeforeSave:false})
-            await deleteFromCloudinary(currImage);
             //return res.status(200).json(new ApiResponse(200,reviewImage,"Review Image updated successfully"))
         } catch (error) {
             console.error('Error uploading image to Cloudinary:', error);
             throw new ApiError(500, "Error uploading image to Cloudinary");
         }
     }
+
+    await updateProductRating(review.productId);
 
     const updatedReview = await review.save({validateBeforeSave:false})
     if(!updatedReview) throw new ApiError(500, "Error updating review")
@@ -87,18 +98,17 @@ const updateReview = asyncHandler(async (req, res) => {
 
 const deleteReview = asyncHandler(async (req, res) => {
     const {reviewId} = req.params
-    const review=await Review.findById(reviewId);
+
     if(!reviewId) throw new ApiError(400, "Review ID is required")
-    const reviewImage=review.reviewImage;
+
     const deletedReview = await Review.findOneAndDelete({
         _id:reviewId,
         userId:req.user._id
-    }) 
+    })
+
+    //image deletion from cloudinary code 
 
     if(!deletedReview) throw new ApiError(404, "Review not found")
-    if(reviewImage) 
-        await deleteFromCloudinary(reviewImage)
-    
     return res.status(200).json(new ApiResponse(200, deletedReview, "Review deleted successfully"))
 
 })

@@ -8,14 +8,14 @@ import {
     getOrderItemById,
     updateOrderStatus,
     getAllOrderAndDetails
-} from "../controllers/orderItems.controllers.js";
+} from "../controllers/orderItems.controller.js";
 
 const router = Router()
 
 router.route("/create").post(verifyJWT, createOrderItems)
 router.route("/:orderID").get(verifyJWT, getOrderItems)
 
-router.route("/seller").get(verifyJWT, getOrderBySellers)
+router.route("/seller/allorders").get(verifyJWT, getOrderBySellers)
 router.route("/status/:itemId").get(verifyJWT, getOrderItemById)
 router.route("/status/:orderItemId").put(verifyJWT, updateOrderStatus)
 

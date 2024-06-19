@@ -83,56 +83,63 @@ const createProduct = asyncHandler(async (req, res) => {
 });
 
 const updateProduct = asyncHandler(async (req, res) => {
-  const { productId } = req.params;
-  if (!productId) throw new ApiError(400, "Product id not specified");
-
-  let { name, description, price, stock, categoryName } = req.body;
-
-  if (!name && !description && !price && !stock && !categoryName)
-    throw new ApiError(404, "No fields specified to update");
-
-  const product = await Product.findById(productId);
-  if (!product) throw new ApiError(404, "Product not found");
-
-  if (!product.sellerInfo.equals(req.user._id)) {
-    throw new ApiError(400, "Unauthorized to update products");
-  }
-
-  let updateFields = {};
-
-  // Add fields to updateFields if they are present in the request
-  if (name) updateFields.name = name;
-  if (description) updateFields.description = description;
-  if (price) updateFields.price = price;
-  if (stock) updateFields.stock = stock;
-  if (categoryName) {
-    const category = await Category.findOne({ name: categoryName });
-    if (!category) throw new ApiError(404, "Category not found");
-    updateFields.categoryId = category._id;
-  }
-
-  // Update the product in the database
-  const updatedProduct = await Product.findByIdAndUpdate(
-    productId,
-    { $set: updateFields },
-    { new: true, runValidators: true }
-  );
-
-  // Check if the product exists
-  if (!updatedProduct) {
-    throw new ApiError(404, "Product not found");
-  }
-
-  // Respond with the updated product
-  res
-    .status(200)
-    .json(
-      new ApiResponse(
-        201,
-        updateProduct,
-        "Product details updated successfully"
-      )
+  try {
+    const { productId } = req.params;
+    if (!productId) throw new ApiError(400, "Product id not specified");
+  
+    let { name, description, price, stock, categoryName } = req.body;
+    
+    console.log(req.body);
+    if (!name && !description && !price && !stock && !categoryName)
+      throw new ApiError(404, "No fields specified to update");
+    
+  
+    const product = await Product.findById(productId);
+    if (!product) throw new ApiError(404, "Product not found");
+  
+    if (!product.sellerInfo.equals(req.user._id)) {
+      throw new ApiError(400, "Unauthorized to update products");
+    }
+  
+    let updateFields = {};
+  
+    // Add fields to updateFields if they are present in the request
+    if (name) updateFields.name = name;
+    if (description) updateFields.description = description;
+    if (price) updateFields.price = price;
+    if (stock) updateFields.stock = stock;
+    if (categoryName) {
+      const category = await Category.findOne({ name: categoryName });
+      if (!category) throw new ApiError(404, "Category not found");
+      updateFields.categoryId = category._id;
+    }
+  
+    // Update the product in the database
+    const updatedProduct = await Product.findByIdAndUpdate(
+      productId,
+      { $set: updateFields },
+      { new: true, runValidators: true }
     );
+  
+    // Check if the product exists
+    if (!updatedProduct) {
+      throw new ApiError(404, "Product not found");
+    }
+    console.log(updatedProduct);
+  
+    // Respond with the updated product
+    res
+      .status(200)
+      .json(
+        new ApiResponse(
+          201,
+          updateProduct,
+          "Product details updated successfully"
+        )
+      );
+  } catch (error) {
+    console.log("Error in updateProduct:", error);
+  }
 });
 
 const deleteProduct = asyncHandler(async (req, res) => {

@@ -26,7 +26,7 @@ import paymentRouter from './routes/payment.routes.js'
 
 //routes declaration
 app.use('/api/v1/users',userRouter)
-app.use('/api/v1/users/addresses',addressRouter)
+app.use('/api/v1/addresses',addressRouter)
 app.use('/api/v1/products',productRouter)
 app.use('/api/v1/sellers',sellerRouter)
 app.use('/api/v1/categories',categoryRouter)

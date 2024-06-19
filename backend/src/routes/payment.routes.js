@@ -1,15 +1,30 @@
-import {Router} from "express";
-import {verifyJWT} from "../middlewares/auth.middleware.js";
-import { createOrder, fetchOrder, fetchPayment, getKeys, paymentfailure, verifyPayment } from "../controllers/payment.controller.js";
+import { Router } from "express";
+//import { verifyJwt, verifyUser } from "../middlewares/auth.middleware.js";
 
-const router=Router();
+import {
+  createOrder,
+  verifyPayment,
+  fetchOrder,
+  fetchPayment,
+  paymentfailure,
+  getKeys,
+} from "../controllers/payment.controller.js";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 
-router.route('/create-order').post(verifyJWT,createOrder);//working
-router.route('/verify-payment').post(verifyPayment);
-router.route('/fetch-order/:id').get(verifyJWT,fetchOrder);
-router.route('/fetch-payment/:id').get(verifyJWT,fetchPayment);
-router.route('/payment-failure').post(verifyJWT,paymentfailure);
+const router = Router();
 
-router.route('/get-keys').get(verifyJWT,getKeys);
+router.route("/getKeys").post(verifyJWT, 
+    //verifyUser, 
+    getKeys);
+router.route("/createOrder").post(verifyJWT, 
+    //verifyUser, 
+    createOrder);
+router.route("/verifyPayment").post(verifyJWT, 
+    //verifyUser,
+     verifyPayment);
+router.route("/paymentfailure").post(verifyJWT, paymentfailure);
 
-export default router;
+router.route("/fetchOrder/:id").get(verifyJWT, fetchOrder);
+router.route("/fetchPayment/:id").get(verifyJWT, fetchPayment);
+
+export default router;

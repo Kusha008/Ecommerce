@@ -38,7 +38,7 @@ router.route("/update-address").post(verifyJWTforSeller,updateAddress);//working
 router.route("/update-coverImage").post(verifyJWTforSeller,upload.single("sellerImage"),updateCoverImageSeller);//working
 router.route("/delete-seller").delete(verifyJWTforSeller,deleteSeller);//working
 router.route("/send-verification-email").get(verifyJWTforSeller,sendVerificationEmailSeller);//working
-router.route("/verify-seller").post(verifyJWTforSeller,verifyingSeller);//working
+router.route("/verify-seller-otp").post(verifyJWTforSeller,verifyingSeller);//working
 router.route("/request-email-update").post(verifyJWTforSeller,requestEmailUpdateSeller);//working
 router.route("/verify-email-otp").post(verifyJWTforSeller,verifyAndUpdateEmailSeller);//working
 

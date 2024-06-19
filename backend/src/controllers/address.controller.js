@@ -1,7 +1,7 @@
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { addressModel } from "../models/address.models.js";
+import { Address } from "../models/address.models.js";
 
 
 const addAddress=asyncHandler(async(req,res)=>{
@@ -17,20 +17,21 @@ const addAddress=asyncHandler(async(req,res)=>{
     }
 
     const {addressLine1,addressLine2,zipcode,city,state,country,phoneNumber}=req.body;
+    console.log(req.body);
 
     if(!addressLine1 || !zipcode || !city || !state || !country || !phoneNumber){
         throw new ApiError(400,"Please provide all fields")
     }
 
-    if((country==="India" || country==="india" || country==="INDIA") && !/^\d{6}$/.test(pincode)){
-        throw new ApiError(400,"Please provide a valid pincode")
-    }
+    // if((country==="India" || country==="india" || country==="INDIA")){
+    //     throw new ApiError(400,"Please provide a valid pincode")
+    // }
 
     if(!/^\d{10}$/.test(phoneNumber)){
         throw new ApiError(400,"Please provide a valid contact number")
     }
 
-    const newAddress=await addressModel.create({
+    const newAddress=await Address.create({
         addressLine1,
         addressLine2: addressLine2 || "",
         zipcode,
@@ -55,11 +56,11 @@ const userAddresses=asyncHandler(async(req,res)=>{
     if(!user){
         throw new ApiError(401,"Unauthorized User")
     }
-    const addresses=await addressModel.find({userId:user._id});
+    const addresses=await Address.find({userId:user._id});
     if(!addresses){
         throw new ApiError(400,"No addresses found")
     }
-    
+    console.log(addresses)
     return res.status(200)
     .json(new ApiResponse(200,addresses,"Addresses fetched successfully for the user"))
 });
@@ -70,12 +71,12 @@ const deleteAddress = asyncHandler(async (req, res) => {
         throw new ApiError(401, "Unauthorized User");
     }
 
-    const addressId = req.params.id;
+    const {addressId} = req.params;
     if (!addressId) {
         throw new ApiError(400, "Please provide address id");
     }
 
-    const address = await addressModel.findById(addressId);
+    const address = await Address.findById(addressId);
     if (!address) {
         throw new ApiError(400, "No address found");
     }
@@ -85,13 +86,13 @@ const deleteAddress = asyncHandler(async (req, res) => {
         throw new ApiError(403, "You are not authorized to delete this address");
     }
 
-    await addressModel.findByIdAndDelete(addressId);
+    await Address.findByIdAndDelete(addressId);
 
     return res.status(200).json(new ApiResponse(200, null, "Address deleted successfully"));
 });
 
 const updateAddress=asyncHandler(async(req,res)=>{
-    const addressId = req.params.id;
+    const {addressId} = req.params;
     const user=req.user;
     if(!user){
         throw new ApiError(401,"Unauthorized User")
@@ -101,7 +102,7 @@ const updateAddress=asyncHandler(async(req,res)=>{
     if(!addressLine1 || !zipcode || !city || !state || !country || !phoneNumber){
         throw new ApiError(400,"Please provide all fields")
     }
-    const currentAddress=await addressModel.findById(addressId);
+    const currentAddress=await Address.findById(addressId);
     if(!currentAddress){
         throw new ApiError(400,"Address not found")
     }
