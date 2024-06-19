@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { BsPencilSquare } from "react-icons/bs";
-import { patchUser } from "../../store/slices/userSlice.js";
+import { patchUser } from "../../store/slices/userSlice";
 import { useLocation, Link } from "react-router-dom";
-// import userDetails from "../../store/slices/userSlice.js";
 import axios from "axios";
-import refreshUser from "../../utils/refreshUser.jsx";
 
-function AccountInfo() {
-
+function ProfilePage() {
   const fullPath = window.location.href;
   const location = useLocation();
   const initialPath = fullPath.replace(location.pathname, "") + "/";
@@ -23,25 +20,18 @@ function AccountInfo() {
   const [error, setError] = useState(null);
 
   // for changing password
-  const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [otp, setOtp] = useState("");
 
   const [message, setMessage] = useState("");
 
-  
-  const { refreshUserData } = refreshUser();
-  useEffect(() => {
-    refreshUserData();
-  }, []);
-
-  /*Backend functions*/
-
+  {
+    /Backend functions/
+  }
   const updateProfileBackend = async () => {
     try {
       const response = await axios.patch(
-        `/v1/users/update/profile`,
+        'http://localhost:8000/api/v1/users/update-fullname',
         {
           [editingField]: editedValue,
         },
@@ -61,36 +51,13 @@ function AccountInfo() {
     }
   }; //working
 
-  const updateEmailBackend = async () => {
-    try {
-      const response = await axios.patch(
-        '/v1/users/update-email',
-        {
-          email: editedValue,
-        },
-        {
-          withCredentials: true,
-        }
-      );
-
-      if (response.status === 200) {
-        console.log("Email updated successfully");
-        dispatch(patchUser({ [editingField]: editedValue }));
-        return response.data;
-      }
-    } catch (error) {
-      console.log("Error updating email:", error);
-      setError(error.response.data.message);
-      throw error;
-    }
-  }; //working
-
   const updatePhoneBackend = async () => {
     try {
       const response = await axios.patch(
-        `http://localhost:8000/api/v1/users/update-phone`,
+        'http://localhost:8000/api/v1/users/update-phone',
         {
-          phone: editedValue,
+          newPhone: editedValue,
+          //password: password,
         },
         {
           withCredentials: true,
@@ -111,7 +78,9 @@ function AccountInfo() {
 
   const updateCoverImageBackend = async () => {
     const formData = new FormData();
-    formData.append("coverImage", coverImage);
+    formData.append('coverImage', coverImage);
+    console.log("CoverImage:", coverImage);
+    console.log("formData:", formData);
 
     try {
       const response = await axios.patch(
@@ -124,14 +93,15 @@ function AccountInfo() {
           },
         }
       );
-      // console.log(response.data.data.coverImage)
+      
+
       if (response.status === 200) {
-        console.log("coverImage updated successfully");
+        console.log("CoverImage updated successfully");
         dispatch(patchUser({ coverImage: response.data.data.coverImage }));
         return response.data;
       }
     } catch (error) {
-      console.log("Error updating coverImage:", error);
+      console.log("Error updating coverimage:", error);
       setError(error.response.data.message);
       throw error;
     }
@@ -140,7 +110,7 @@ function AccountInfo() {
   const sentOtpBackend = async () => {
     try {
       const response = await axios.post(
-        `/v1/users/generate-email-otp`,
+        'http://localhost:8000/api/v1/users/generate-email-otp',
         {
           email: user.email,
         },
@@ -163,11 +133,10 @@ function AccountInfo() {
   const updatePasswordBackend = async () => {
     try {
       const response = await axios.post(
-        `/v1/users/verifyotp`,
+        'http://localhost:8000/api/v1/users/change-password',
         {
-          newPassword: newPassword,
-          confirmPassword: confirmPassword,
-          otp: otp,
+          oldPassword,
+          newPassword,
         },
         {
           withCredentials: true,
@@ -176,11 +145,14 @@ function AccountInfo() {
 
       if (response.status === 200) {
         console.log("Password updated successfully");
+        setMessage("Password updated successfully");
+        setOldPassword("");
+        setNewPassword("");
         return response.data;
       }
     } catch (error) {
       console.log("Error updating password:", error);
-      setError(error.response.data.message);
+      setError(error.response.data.message || "Error updating password");
       throw error;
     }
   };
@@ -208,40 +180,36 @@ function AccountInfo() {
     }
   }, [error, message]);
 
-  const handleAvatarChange = (e) => {
-    const file = e.target.files[0];
-    setCoverImage(file);
+  const handleCoverChange = (e) => {
+    const file = e.target.files;
+    console.log("File:", file[0]);
+    setCoverImage(file[0]);
     updateCoverImageBackend();
   };
 
-  const sendOtp = async () => {
-    await sentOtpBackend();
-    setShowPasswordChange(!showPasswordChange);
-  };
+  useEffect(() => {
+    if (coverImage) {
+      updateCoverImageBackend();
+    }
+  }, [coverImage]);
 
   const handlePasswordChange = async () => {
-    if (!newPassword || !confirmPassword || !otp) {
-      setError("Please fill all the fields");
-      return;
+    try {
+      await updatePasswordBackend();
+      setEditingField(null);
+    } catch (error) {
+      console.error(error);
     }
-    console.log("Changing password");
-    await updatePasswordBackend();
-    setShowPasswordChange(false);
-    setMessage("Password changed successfully");
   };
 
   {
-    /*Buttons*/
+    /Buttons/
   }
   const renderEditButton = (field) => (
     <button
       onClick={() => {
-        setShowPasswordChange(false);
-        if (editingField === field) {
-          setEditingField(null);
-          setEditedValue("");
-        } else {
-          setEditingField(field);
+        setEditingField(field);
+        if (field !== "password") {
           setEditedValue(user?.[field] || "");
         }
       }}
@@ -275,11 +243,6 @@ function AccountInfo() {
     </>
   );
 
-  
-
-  {
-    /*****/
-  }
   const renderField = (label, field) => {
     const isSensitiveField = field === "email" || field === "phone";
 
@@ -311,7 +274,7 @@ function AccountInfo() {
         </div>
         {editingField === field && isSensitiveField && (
           <div className="mt-2">
-            <label className="block text-sm font-semibold mb-2 text-slate-500">
+            {/* <label className="block text-sm font-semibold mb-2 text-slate-500">
               Confirm Password
             </label>
             <input
@@ -320,123 +283,142 @@ function AccountInfo() {
               className="rounded-md border w-full bg-purple-200 border-gray-300 py-3 px-4 text-gray-700"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-            />
+            /> */}
           </div>
         )}
       </div>
     );
   };
 
-  return (
-    <div className="container mx-auto p-4 ">
-      <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
-        Account Information
-      </h2>
-      <div className="relative flex items-center justify-center mb-8">
-        <img
-          src={user?.coverImage}
-          className="w-24 h-24 rounded-full mr-4"
-          alt="User Avatar"
-        />
-        <label htmlFor="avatar-upload" className="cursor-pointer">
-          <BsPencilSquare className="text-gray-700 hover:text-blue-700" />
-        </label>
+  const renderPasswordChangeFields = () => (
+    <div className="rounded-lg shadow-md p-6 bg-white m-2 row-span-2">
+      <h3 className="text-md font-semibold mb-2 text-slate-500">Change Password</h3>
+      <div className="flex flex-col items-start space-y-4">
         <input
-          id="avatar-upload"
-          type="file"
-          className="hidden"
-          onChange={handleAvatarChange}
+          type="password"
+          placeholder="Old Password"
+          value={oldPassword}
+          onChange={(e) => setOldPassword(e.target.value)}
+          className="rounded-md border bg-purple-200 border-gray-300 py-2 px-4 w-full"
+          required
         />
-      </div>
-      <div className="mb-10 bg-gray-200 px-2 pt-2 pb-4 rounded-lg">
-        <div className=" px-4 pt-4 flex flex-col ">
-          <span className="text-black text-2xl font-bold">
-            Personal Information
-          </span>
-          <span className="text-sm text-red-500 font-mono flex justify-center p-2">
-            {error}
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-4 px-2">
-          <div className="col-span-1">
-            {renderField("Username", "username")}
-          </div>
-          <div className="col-span-1">
-            {renderField("Full Name", "fullName")}
-          </div>
-          <div className="col-span-1">{renderField("Email", "email")}</div>
-          <div className="col-span-1">{renderField("Phone", "phone")}</div>
-
-          {!showPasswordChange ? (
-            <>
-              <div className="rounded-lg shadow-md p-6 bg-white m-2">
-                <h3 className="text-md font-semibold mb-2 text-slate-500">
-                  Password
-                </h3>
-                <div className="rounded-md border bg-purple-200 border-gray-300 py-2 px-4 w-full">
-                  <button
-                    className="text-md text-gray-700 font-semibold hover:text-blue-500 active:text-black"
-                    onClick={() => sendOtp()}
-                  >
-                    Click here to change your password
-                  </button>
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="rounded-lg shadow-md p-6 bg-white m-2 row-span-2">
-              <h3 className="text-md font-semibold mb-2 text-slate-500">
-                Change Password
-              </h3>
-              <div className="flex flex-col items-start space-y-4">
-                <input
-                  type="text"
-                  placeholder="New Password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  className="rounded-md border bg-purple-200 border-gray-300 py-2 px-4 w-full"
-                  required
-                />
-                <input
-                  type="text"
-                  placeholder="Confirm Password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="rounded-md border bg-purple-200 border-gray-300 py-2 px-4 w-full"
-                  required
-                />
-                <input
-                  type="text"
-                  placeholder="Email OTP"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  className="rounded-md border bg-purple-200 border-gray-300 py-2 px-4 w-full"
-                  re
-                  quired
-                />
-                <div className="space-x-4">
-                  <button
-                    onClick={() => handlePasswordChange()}
-                    className="text-blue-500 hover:text-blue-700 focus:outline-none text-s bg-transparent "
-                  >
-                    Save
-                  </button>
-
-                  <button
-                    className="text-red-500 hover:text-red-700 focus:outline-none text-s bg-transparent "
-                    onClick={() => setShowPasswordChange(false)}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+        <input
+          type="password"
+          placeholder="New Password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          className="rounded-md border bg-purple-200 border-gray-300 py-2 px-4 w-full"
+          required
+        />
+        <div className="space-x-4">
+          <button
+            onClick={handlePasswordChange}
+            className="text-blue-500 hover:text-blue-700 focus:outline-none text-s bg-transparent "
+          >
+            Save
+          </button>
+          <button
+            className="text-red-500 hover:text-red-700 focus:outline-none text-s bg-transparent "
+            onClick={() => {
+              setEditingField(null);
+              setOldPassword("");
+              setNewPassword("");
+            }}
+          >
+            Cancel
+          </button>
         </div>
       </div>
     </div>
   );
+
+  return (
+    <div className="container mx-auto p-4">
+      <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Account Information</h2>
+      <div className="relative flex items-center justify-center mb-8">
+        <img src={user?.coverImage} className="w-24 h-24 rounded-full mr-4" alt="User Avatar" />
+        <label htmlFor="avatar-upload" className="cursor-pointer">
+          <BsPencilSquare className="text-gray-700 hover:text-blue-700" />
+        </label>
+        <input id="avatar-upload" type="file" className="hidden" onChange={handleCoverChange} />
+      </div>
+      {renderField("Full Name", "fullName")}
+      {renderField("Email", "email")}
+      {renderField("Phone", "phone")}
+      {editingField === "password" ? renderPasswordChangeFields() : (
+        <div className="rounded-lg shadow-md p-6 bg-white m-2">
+          <h3 className="text-md font-semibold mb-2 text-slate-500">Password</h3>
+          <button
+            onClick={() => setEditingField("password")}
+            className="text-blue-500 hover:text-blue-700 focus:outline-none text-s bg-transparent "
+          >
+            Edit
+          </button>
+        </div>
+      )}
+      {message && (
+        <div className="rounded-lg shadow-md p-6 bg-green-100 m-2 text-green-700">
+          {message}
+        </div>
+      )}
+      {error && (
+        <div className="rounded-lg shadow-md p-6 bg-red-100 m-2 text-red-700">
+          {error}
+        </div>
+      )}
+      <div className="mb-10 bg-gray-200 px-2 pt-2 pb-4 rounded-lg">
+        <div className="-m-1 text-black text-2xl font-bold p-4">
+          General Information
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 px-2 space-x-7">
+          <div className="rounded-lg shadow-md p-6 bg-white m-2">
+            <h3 className="text-md font-semibold mb-2 text-slate-500">
+              Verified
+            </h3>
+            <div className="rounded-md border bg-purple-200 border-gray-300 py-2 px-4 w-full">
+              <div className="text-md text-gray-700 font-semibold">
+                {user?.isVerified ? (
+                  "Verified"
+                ) : (
+                  <>
+                    <div>Not verfied</div>
+                    <button
+                      className="text-xs hover:text-sm active:text-gray-500"
+                      //onClick={handleVerify}
+                    >
+                      Click here to verify your account
+                    </button>
+                    <div className="text-sm text-blue-500 font-mono flex justify-center p-2">
+                      {message}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-lg shadow-md p-6 bg-white m-2">
+            <h3 className="text-md font-semibold mb-2 text-slate-500">Role</h3>
+            <div className="rounded-md border bg-purple-200 border-gray-300 py-2 px-4 w-full">
+              <p className="text-md text-gray-700 font-semibold">
+                {user?.isAdmin ? (
+                  <Link to="/admin" className="font-bold">
+                    Admin
+                    <div className="font-mono text-xs font-extralight">
+                      Click here to move to admin panel
+                    </div>
+                  </Link>
+                ) : (
+                  "User"
+                )}
+              </p>
+            </div>
+          </div>
+        </div>
+    </div>
+    </div>
+  );
 }
 
-export default AccountInfo;
+export default ProfilePage;

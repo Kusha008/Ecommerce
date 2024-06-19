@@ -32,15 +32,15 @@ const Footer = () => {
     ];
     return (
         <div className="bottom-0 left-0 right-0 font-poppins cursor-default">
-          <div className="py-16 px-12 grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-2 grid-cols-1 bg-blue-900 text-white w-full relative ">
+          <div className="py-16 px-12 grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-2 grid-cols-1 bg-gray-200 text-black w-full relative ">
             <div className="">
               <div className="footer-img flex items-center">
-                <img src={Logo} alt="" className="w-20 h-auto" />{" "}
-                <span className="text-4xl font-bold pl-3 text-white font-serif">
-                  E-Commerce Store
+                <img src="https://res.cloudinary.com/daqh5tie1/image/upload/v1718736928/tlartemna8pgva8fdknd.gif" alt="" className="w-20 h-auto" />{" "}
+                <span className="text-4xl font-bold pl-3 text-black font-serif">
+                  Expedite Mart
                 </span>
               </div>
-              <div className="infos text-gray-200 my-2">
+              <div className="infos text-black my-2">
                 <span>Copyright © 2024 .</span>
                 <span>All rights reserved</span>
               </div>
@@ -68,7 +68,7 @@ const Footer = () => {
               {links.map((col, index) => {
                 return (
                   <ul className={`col col-${index + 1}`} key={`col-${index}`}>
-                    <li className="text-2xl text-white font-bold mb-2">
+                    <li className="text-2xl text-black font-bold mb-2">
                       {col.heading}
                     </li>
                     {col.items.map((link, index) => {
@@ -77,7 +77,7 @@ const Footer = () => {
                           key={`link-${col}-${index}`}
                           className={`text-gray-400 cursor-pointer ${
                             link.key === "header-1" || link.key === "header-2"
-                              ? "text-2xl text-white"
+                              ? "text-2xl text-black"
                               : ""
                           }`}
                         >
@@ -96,7 +96,7 @@ const Footer = () => {
               <input
                 type="email"
                 placeholder="Subscribe to our email"
-                className="mt-2 w-full border-none rounded-lg py-3 px-6 text-gray-800 bg-gray-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-100 transition duration-300 ease-in-out"
+                className="mt-2 w-full border-none rounded-lg py-3 px-6 text-gray-800 bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-100 transition duration-300 ease-in-out"
               />
             </div>
           </div>

@@ -3,11 +3,13 @@ import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage'; // Default storage for web
 import userReducer from './slices/userSlice';
 import cartReducer from './slices/cartSlice';
+import sellerReducer from './slices/sellerSlice.js';
 
 // Combine the reducers into a single root reducer
 const rootReducer = combineReducers({
   user: userReducer,
   cart: cartReducer,
+  seller: sellerReducer,
 });
 
 // Define persist configuration

@@ -22,10 +22,10 @@ function Banner() {
             alt="Bisariyon"
           />
           <div className="banner-gradient"></div>
-          <div className="banner-text">
+          {/* <div className="banner-text">
             Welcome to our store
             <h2 className="banner-subtext">EarlyBird Sale Live Now!!</h2>
-          </div>
+          </div> */}
         </div>
         <div className="relative h-full">
           <img
@@ -35,9 +35,9 @@ function Banner() {
             alt="Sale"
           />
           <div className="banner-gradient"></div>
-          <div className="banner-text">
+          {/* <div className="banner-text">
             New Arrivals Just for You
-          </div>
+          </div> */}
         </div>
         <div className="relative h-full">
           <img
@@ -47,9 +47,9 @@ function Banner() {
             alt="Sale"
           />
           <div className="banner-gradient"></div>
-          <div className="banner-text">
+          {/* <div className="banner-text">
             Limited Time Offers
-          </div>
+          </div> */}
         </div>
         <div className="relative h-full">
           <img
@@ -62,9 +62,9 @@ function Banner() {
             }}
           />
           <div className="banner-gradient"></div>
-          <div className="banner-text">
+          {/* <div className="banner-text">
             Get Free Shipping
-          </div>
+          </div> */}
         </div>
         <div className="relative h-full">
           <img
@@ -74,9 +74,9 @@ function Banner() {
             alt="Sale"
           />
           <div className="banner-gradient"></div>
-          <div className="banner-text">
+          {/* <div className="banner-text">
             Exclusive Discounts
-          </div>
+          </div> */}
         </div>
       </Carousel>
     </div>

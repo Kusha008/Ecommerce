@@ -8,7 +8,7 @@ function useRefreshUser() {
     const refreshUserData = async () => {
         try {
             const response = await axios.get(
-               `/api/v1/users/current-user`,
+                `/api/v1/users/current-user`,
                 { withCredentials: true }
             );
 
@@ -27,4 +27,4 @@ function useRefreshUser() {
     return { refreshUserData };
 }
 
-export default useRefreshUser;
+export default useRefreshUser;
